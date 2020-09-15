@@ -1,33 +1,31 @@
-package main.java;
-
-import com.google.gson.reflect.TypeToken;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.google.gson.Gson;
 import static java.nio.charset.StandardCharsets.*;
 import java.time.Duration;
-import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Function;
 
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
-import org.apache.commons.cli.*;
-import org.apache.commons.cli.DefaultParser;
 
 public class MyServiceBusTopicClient {
 
+
     static final Gson GSON = new Gson();
-    static int count = 0;
+    static SendClient sendClient;
 
     public static void main(String[] args) throws Exception, ServiceBusException {
+        System.out.println("bob");
+        SendClient sendClient = new SendClient();
         String connectionString = "Endpoint=sb://internbus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Wyg8Br7V97VvOJKv7YZ0TYPWONkm6PiNoDUWN1JF+tE=";
         SubscriptionClient subscription1Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S1"), ReceiveMode.PEEKLOCK);
-        SubscriptionClient subscription2Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S2"), ReceiveMode.PEEKLOCK);
-        SubscriptionClient subscription3Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S3"), ReceiveMode.PEEKLOCK);
+        //SubscriptionClient subscription2Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S2"), ReceiveMode.PEEKLOCK);
+        //SubscriptionClient subscription3Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S3"), ReceiveMode.PEEKLOCK);
 
         registerMessageHandlerOnClient(subscription1Client);
-        registerMessageHandlerOnClient(subscription2Client);
-        registerMessageHandlerOnClient(subscription3Client);
+        //registerMessageHandlerOnClient(subscription2Client);
+        //registerMessageHandlerOnClient(subscription3Client);
+
+
     }
 
     static void registerMessageHandlerOnClient(SubscriptionClient receiveClient) throws Exception {
@@ -37,29 +35,26 @@ public class MyServiceBusTopicClient {
             // callback invoked when the message handler loop has obtained a message
             public CompletableFuture<Void> onMessageAsync(IMessage message) {
                 // receives message is passed to callback
-                if (message != null ) {
-                    count++;
-                    byte[] body = message.getBody();
-                    String text = new String(body, UTF_8);
+                byte[] body = message.getBody();
+                String text = new String(body, UTF_8);
 
-                    if(count%3==0){
-
-                        SendClient sendClient = new SendClient();
-                    try {
-                        sendClient.task(text);
-                    } catch (ServiceBusException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    }
-                    System.out.printf(
-                            "\n\t\t\t\t%s Message received: \n\t\t\t\t\t\tMessageId = %s \n\t\t\t\t\t\t",
-                            receiveClient.getEntityPath(),
-                            message.getMessageId());
-                    System.out.println(text);
+                try {
+                    sendClient.task(text);
+                } catch (ServiceBusException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+
+                System.out.printf(
+                        "\n\t\t\t\t%s Message received: \n\t\t\t\t\t\tMessageId = %s \n\t\t\t\t\t\t",
+                        receiveClient.getEntityPath(),
+                        message.getMessageId());
+                System.out.println(text);
+
                 return receiveClient.completeAsync(message.getLockToken());
+
+
             }
 
             public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {

@@ -1,5 +1,3 @@
-package main.java;
-
 import com.google.gson.reflect.TypeToken;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
@@ -18,14 +16,14 @@ public class SendClient {
 
         static final Gson GSON = new Gson();
         private static String Text;
+        static TopicClient sendClient;
 
         public static void task(String text) throws ServiceBusException, InterruptedException {
             // TODO Auto-generated method stub
             Text = text;
 
             String connectionString = "Endpoint=sb://internbus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Wyg8Br7V97VvOJKv7YZ0TYPWONkm6PiNoDUWN1JF+tE=";
-            TopicClient sendClient;
-            //if(sendClient==null)
+            if(sendClient==null)
             sendClient = new TopicClient(new ConnectionStringBuilder(connectionString, "mytopic2"));
 
             sendMessagesAsync(sendClient).thenRunAsync(() -> sendClient.closeAsync());
@@ -42,6 +40,7 @@ public class SendClient {
                 message.setLabel("Scientist");
                 message.setMessageId(messageId);
                 message.setTimeToLive(Duration.ofMinutes(2));
+
                 System.out.printf("Message sending: Id = %s\n", message.getMessageId());
                 tasks.add(
                         sendClient.sendAsync(message).thenRunAsync(() -> {
