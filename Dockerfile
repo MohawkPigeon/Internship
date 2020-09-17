@@ -1,9 +1,11 @@
-FROM openjdk:8
-COPY ./out/production/InternshipProject/ /tmp
-WORKDIR /tmp
+FROM alpine as builder
+WORKDIR /workspace/app
+COPY . .
+RUN apk update && apk add openjdk14 maven --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+RUN mvn package
 
-RUN echo "r <- getOption('repos'); r['MICROSOFT'] <- 'https://www.nuget.org/packages/Microsoft.Azure.ServiceBus/'; options(repos = r);" > ~/.Rprofile
-
-RUN Rscript -e "install.packages('Microsoft.Azure.ServiceBus')"
-
-ENTRYPOINT ["java","MyServiceBusTopicClient"]
+FROM alpine
+RUN apk update && apk add openjdk14-jre --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+ARG JAR_FILE=target/cloud.erpacl.erpdataparser-*.jar
+COPY --from=builder /workspace/app/${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
