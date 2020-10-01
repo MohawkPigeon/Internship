@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intern-deployment
+  labels:
+    app: intern-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: intern-deployment
+      labels:
+        app: intern-deployment
+    spec:
+      containers:
+        - name: intern-deployment
+          image: java:latest
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: intern-deployment
+
