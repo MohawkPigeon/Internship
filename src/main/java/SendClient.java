@@ -12,19 +12,26 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.DefaultParser;
 
-public class SendClient {
+public class SendClient implements Runnable {
 
         static final Gson GSON = new Gson();
         private static String Text;
         static TopicClient sendClient;
 
-        public static void task(String text) throws ServiceBusException, InterruptedException {
-            // TODO Auto-generated method stub
+        public SendClient(String text){
             Text = text;
+        }
 
+        public void run() {
+            // TODO Auto-generated method stub
             String connectionString = "Endpoint=sb://internbus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Wyg8Br7V97VvOJKv7YZ0TYPWONkm6PiNoDUWN1JF+tE=";
-            if(sendClient==null)
-            sendClient = new TopicClient(new ConnectionStringBuilder(connectionString, "mytopic2"));
+            //if(sendClient==null) {
+                try {
+                    sendClient = new TopicClient(new ConnectionStringBuilder(connectionString, "mytopic2"));
+                } catch (InterruptedException | ServiceBusException e) {
+                    e.printStackTrace();
+                }
+            //}
 
             sendMessagesAsync(sendClient).thenRunAsync(() -> sendClient.closeAsync());
         }

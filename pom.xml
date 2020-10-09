@@ -34,12 +34,7 @@
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-servicebus</artifactId>
-      <version>3.3.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>azure-servicebus</artifactId>
-      <version>3.3.0</version>
+      <version>3.4.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -56,13 +51,13 @@
       <plugins>
         <plugin>
           <artifactId>azure-functions-maven-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.0</version>
           <dependencies>
             <!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-servicebus -->
             <dependency>
               <groupId>com.microsoft.azure</groupId>
               <artifactId>azure-servicebus</artifactId>
-              <version>3.3.0</version>
+              <version>3.4.0</version>
             </dependency>
           </dependencies>
         </plugin>

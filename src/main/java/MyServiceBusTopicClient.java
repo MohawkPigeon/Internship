@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 
-public class MyServiceBusTopicClient {
+public class MyServiceBusTopicClient extends Thread{
 
 
     static final Gson GSON = new Gson();
@@ -15,7 +15,8 @@ public class MyServiceBusTopicClient {
 
     public static void main(String[] args) throws Exception, ServiceBusException {
         System.out.println("bob");
-        SendClient sendClient = new SendClient();
+
+        //SendClient sendClient = new SendClient();
         String connectionString = "Endpoint=sb://internbus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Wyg8Br7V97VvOJKv7YZ0TYPWONkm6PiNoDUWN1JF+tE=";
         SubscriptionClient subscription1Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S1"), ReceiveMode.PEEKLOCK);
         //SubscriptionClient subscription2Client = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "mytopic/Subscriptions/S2"), ReceiveMode.PEEKLOCK);
@@ -38,13 +39,14 @@ public class MyServiceBusTopicClient {
                 byte[] body = message.getBody();
                 String text = new String(body, UTF_8);
 
-                try {
-                    sendClient.task(text);
-                } catch (ServiceBusException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                SendClient thread = new SendClient(text);
+                new Thread(thread).start();
+
+              //  try {
+              //      SendClient.task(text);
+              //  } catch (ServiceBusException | InterruptedException e) {
+              //      e.printStackTrace();
+              //  }
 
                 System.out.printf(
                         "\n\t\t\t\t%s Message received: \n\t\t\t\t\t\tMessageId = %s \n\t\t\t\t\t\t",
@@ -58,7 +60,7 @@ public class MyServiceBusTopicClient {
             }
 
             public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {
-                System.out.printf(exceptionPhase + "-" + throwable.getMessage());
+                System.out.print(exceptionPhase + "-" + throwable.getMessage());
             }
         };
 

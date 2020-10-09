@@ -1,23 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: internship
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: intern-deployment
+  name: image-processor
+  namespace: internship
   labels:
-    app: intern-deployment
+    app: image-processor
 spec:
   replicas: 1
   template:
     metadata:
-      name: intern-deployment
+      name: image-processor
       labels:
-        app: intern-deployment
+        app: image-processor
     spec:
       containers:
-        - name: intern-deployment
-          image: java:latest
+        - name: image-processor
+          image: localhost:5000/image-processor:2
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
   selector:
     matchLabels:
-      app: intern-deployment
-
+      app: image-processor
